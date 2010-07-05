@@ -79,7 +79,11 @@ class Contacts
           email_match_text_end = Regexp.escape("&amp;")
           
           raw_html = resp.body.grep(/(?:e|dn)lk[0-9]+/)
-          raw_html.delete_at 0
+          # The next line's action deletes my first contact! I do not know why 
+          # the author added this line, but I think that the ranks were 
+          # compelling. So I don't delete the following line and write this 
+          # comment
+          #raw_html.delete_at 0
           raw_html.inject do |memo, row|
             c_info = row.match(/(e|dn)lk([0-9])+/)
             
