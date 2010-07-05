@@ -97,12 +97,21 @@ class Contacts
       if data =~ /var InitialContacts = (\[.*?\]);/
         @contacts += Contacts.parse_json($1).select{|contact|!contact["email"].to_s.empty?}.map{|contact|[contact["contactName"], contact["email"]]}
       elsif data =~ /^\{"response":/
-        @contacts +=  Contacts.parse_json(data)["response"]["ResultSet"]["Contacts"].to_a.select{|contact|!contact["email"].to_s.empty?}.map{|contact|[contact["contactName"], contact["email"]]}
+        parsed_json = Contacts.parse_json(data)
+        @contacts += parsed_json["response"]["ResultSet"]["Contacts"].to_a.select do |contact|
+          !contact["email"].to_s.empty? or !contact["msgrID"].to_s.empty?
+        end.map do |contact|
+          if contact["email"].to_s.empty? and !contact["msgrID"].to_s.empty?
+            [contact["contactName"], "#{contact["msgrID"]}@yahoo.com"]
+          elsif !contact["email"].to_s.empty?
+            [contact["contactName"], contact["email"]]
+          end
+        end
       else
         @contacts
       end
     end
-    
+
   end
 
   TYPES[:yahoo] = Yahoo
